@@ -471,7 +471,9 @@ func (t *Trie) SplitPath(path string) (string, string) {
 The routers now is faster and static routes are 0% fat 🚀.
 
 There still work in progress - who would think that behind a simple router
-there is too much logic evolved. The experience so far has being very pleasant,
-learning and improving every day more about go and its niceties.
+there is too much logic evolved.
+
+The experience so far has being very pleasant, learning and improving every day
+more about go and its niceties.
 
 Any tips, comments or a review will be more than welcome 🙏
