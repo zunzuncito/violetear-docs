@@ -8,11 +8,11 @@ tags= ["benchmark", "profiling", "allocs"]
 
 *Go is fast, but when doing things carefully, besides being faster is very light.*
 
-The history about violetear is not much different from many others - an HTTP
+The history about violetear is not much different from many others - a HTTP
 router capable of handling any requests.
 
 One of the main constraints found at the beginning was how to deal with static
-and dynamic URLs, let's face it if you want to replace an important component of
+and dynamic URL's. Let's face it, if you want to replace an important component of
 your current architecture you should try to break as less as possible - highly
 trained monkeys hate changes. 🐒
 
@@ -66,7 +66,7 @@ func (r *Router) splitPath(p string) []string {
 Go comes with "batteries included" and is very easy to start profiling the code by the
 use of the package [pprof](https://golang.org/pkg/net/http/pprof/).
 
-The first goal was find the bottlenecks, the following code was used for this:
+The first goal was to find the bottlenecks. The following code was used for this:
 
 
 ```go
@@ -155,7 +155,7 @@ This basically will make requests in the following way:
 It is very basic but allows to test the router with both static and dynamic
 handlers.
 
-Once everything is setup, the router should be up and running and listening for
+Once everything is setup, the router should be up, running and listening for
 requests, `wrk` is called like mentioned before and in another terminal this
 command is used:
 
@@ -163,7 +163,7 @@ command is used:
 go tool pprof http://0:8080/debug/pprof/heap
 ```
 
-After running the command you enter into an interactive mode, there I typed
+After running the command you enter into an interactive mode. There I typed
 `top` and got this output:
 
 {{< highlight html "linenos=inline,hl_lines=7 10" >}}
@@ -185,8 +185,8 @@ Showing top 10 nodes out of 25
 
 > Notice lines 7 and 10
 
-Still in the interactive mode, I typed: `list splitPath` this helps to show the
-lines of code, this was the output:
+Still in the interactive mode, I typed: `list splitPath` which helps to show the
+lines of code. This was the output:
 
 {{< highlight html "linenos=inline,hl_lines=10" >}}
 (pprof) list splitPath
@@ -208,7 +208,7 @@ ROUTINE ======================== github.com/nbari/violetear.(*Router).splitPath 
 {{< / highlight >}}
 
 Was evident that splitting the path by using a regular expression was the most
-efficient way to go, I changed the function to someethinig like this:
+efficient way to go. I changed the function to something like this:
 
 ```go
 func (r *Router) splitPath(p string) []string {
@@ -289,7 +289,7 @@ ok      github.com/nbari/violetear      3.380s
 {{< / highlight >}}
 
 
-Before doing the changes this was the output 11 allocations for static routes
+Before doing the changes this was the output: 11 allocations for static routes
 and 14 for dynamic 🐢
 
 {{< highlight html "linenos=inline,hl_lines=9 14" >}}
@@ -338,7 +338,7 @@ And to run the tests writing to a file all the output:
 GODEBUG=allocfreetrace=1 ./test.test -test.run=none -test.bench=BenchmarkRouter -test.benchtime=10ms 2>trace.log
 ```
 
-After doing all this I was available to save up tu 90% of the allocations for
+After doing all this I was available to save up to 90% of the allocations for
 static routes, from 11 to 1:
 
 {{< highlight html "linenos=inline,hl_lines=10 15" >}}
@@ -389,13 +389,13 @@ ok      github.com/nbari/violetear      4.144s
 
 
 
-The router since always has been behaving quite well this mainly thanks to Go
+The router since always has been behaving quite well, this mainly thanks to Go
 itself and well, to the modest traffic it has been handling.
 
 While doing some benchmarks and simulating some DDOS I found some patterns. All
-were related to the way the `request.URL.Path` was handled, the thing I notice
-is that the bigger the request path was the more memory allocations where used,
-at the end was pretty much-making sense since by splitting the path by '/' a
+were related to the way the `request.URL.Path` was handled. The thing I noticed
+was that the bigger the request path was the more memory allocations were used.
+At the end was pretty much making sense since by splitting the path by '/' a
 slice was returned with all the possible parts of the path.
 
 For example, for a request like:
@@ -412,11 +412,11 @@ The router was creating a slice of  10 items:
 ```
 
 In many cases, this would never be defined as routes and could probably just be
-server by a **catch-all(*)** handler.
+served by a **catch-all(*)** handler.
 
-To fix this, instead of splitting and returning a slice, the path is now parsed,
-each component of the path from left to right is used to find within the set of
-defined handlers, so for the same request shown before, the router converts it
+To fix this, instead of splitting and returning a slice, the path is now parsed.
+Each component of the path from left to right is used to find within the set of
+defined handlers; so for the same request shown before, the router converts it
 to:
 
 ```go
@@ -468,12 +468,10 @@ func (t *Trie) SplitPath(path string) (string, string) {
 }
 {{< / highlight >}}
 
-The routers now is faster and static routes are 0% fat 🚀.
+The router now is faster and static routes are 0% fat 🚀.
 
-There still work in progress - who would think that behind a simple router
-there is too much logic evolved.
+There is still work in progress, who will think that behind a simple router; there
+is too much logic evolved. The experience so far has been very pleasant,
+learning and improving every day more about go and its niceties.
 
-The experience so far has being very pleasant, learning and improving every day
-more about go and its niceties.
-
-Any tips, comments or a review will be more than welcome 🙏
+To make an even better improvement, any tips, comments or a review will be more than welcome 🙏
